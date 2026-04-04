@@ -1,0 +1,73 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sidebar-bg); /* Use deep navy for login bg */
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+  width: 100%;
+  max-width: 440px;
+  border-radius: var(--border-radius-lg);
+  padding: 40px;
+  box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-logo {
+  margin: 0 auto 16px auto;
+  width: 64px;
+  height: 64px;
+}
+
+.login-brand h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.login-brand p {
+  color: var(--text-muted);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.login-btn {
+  margin-top: 10px;
+  padding: 14px;
+  font-size: 1rem;
+}
+
+.login-error {
+  background: rgba(238, 93, 80, 0.1);
+  color: var(--danger);
+  padding: 12px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.85rem;
+  text-align: center;
+  border: 1px solid rgba(238, 93, 80, 0.2);
+}
