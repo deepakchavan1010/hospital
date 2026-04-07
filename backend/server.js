@@ -70,6 +70,39 @@ app.post('/api/appointments', (req, res) => {
     });
 });
 
+// Get all prescriptions (optionally filter by patientName)
+app.get('/api/prescriptions', (req, res) => {
+    const patientName = req.query.patient;
+    let sql = 'SELECT * FROM prescriptions';
+    let params = [];
+    
+    if (patientName) {
+        sql += ' WHERE patientName = ?';
+        params.push(patientName);
+    }
+    
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
+    });
+});
+
+// Add a new prescription
+app.post('/api/prescriptions', (req, res) => {
+    const { id, patientId, patientName, medicineName, dosage, instructions, prescribedBy, date } = req.body;
+    const sql = `INSERT INTO prescriptions (id, patientId, patientName, medicineName, dosage, instructions, prescribedBy, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const params = [id, patientId, patientName, medicineName, dosage, instructions, prescribedBy, date];
+    
+    db.run(sql, params, function(err) {
+        if (err) {
+            return res.status(400).json({ error: err.message });
+        }
+        res.status(201).json({ id: id, medicineName });
+    });
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

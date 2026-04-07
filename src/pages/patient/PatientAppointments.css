@@ -1,0 +1,87 @@
+.btn-emerald {
+  background: linear-gradient(135deg, #05cd99, #00b5d8);
+  box-shadow: 0 4px 12px rgba(5, 205, 153, 0.3);
+}
+.btn-emerald:hover {
+  background: linear-gradient(135deg, #00b5d8, #05cd99);
+  box-shadow: 0 6px 16px rgba(5, 205, 153, 0.4);
+}
+.btn-emerald:disabled {
+  background: #e2e8f0;
+  box-shadow: none;
+  color: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.specialization-modal-content {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.modal-description {
+  margin-bottom: 32px;
+  color: var(--text-muted);
+  font-size: 1.05rem;
+}
+
+.specialization-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.spec-card {
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid #edf2f7;
+  border-radius: var(--border-radius-md);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all var(--transition-bounce);
+  color: var(--text-main);
+}
+
+.spec-card:hover {
+  border-color: #05cd99;
+  background: white;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-sm);
+}
+
+.spec-icon-wrapper {
+  background: rgba(5, 205, 153, 0.1);
+  color: #05cd99;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.spec-card:hover .spec-icon-wrapper {
+  background: #05cd99;
+  color: white;
+  transform: scale(1.1);
+}
+
+.spec-card.active {
+  border-color: #05cd99;
+  background: rgba(5, 205, 153, 0.05);
+  box-shadow: 0 0 0 4px rgba(5, 205, 153, 0.1);
+}
+
+.spec-card.active .spec-icon-wrapper {
+  background: #05cd99;
+  color: white;
+}
+
+.spec-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+}

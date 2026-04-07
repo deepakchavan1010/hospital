@@ -37,6 +37,18 @@ db.serialize(() => {
         status TEXT
     )`);
 
+    // 3. Create Prescriptions Table
+    db.run(`CREATE TABLE IF NOT EXISTS prescriptions (
+        id TEXT PRIMARY KEY,
+        patientId TEXT,
+        patientName TEXT,
+        medicineName TEXT,
+        dosage TEXT,
+        instructions TEXT,
+        prescribedBy TEXT,
+        date TEXT
+    )`);
+
     // Check if tables are empty, then seed them
     db.get('SELECT COUNT(*) as count FROM patients', (err, row) => {
         if (row && row.count === 0) {
@@ -67,6 +79,19 @@ db.serialize(() => {
             stmt.finalize();
         }
     });
+    db.get('SELECT COUNT(*) as count FROM prescriptions', (err, row) => {
+        if (row && row.count === 0) {
+            console.log('Seeding initial prescriptions...');
+            const stmt = db.prepare('INSERT INTO prescriptions VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+            const dummyPrescriptions = [
+                ["RX-901", "P-4923", "Eleanor Pena", "Lisinopril 10mg", "1 tablet", "Take 1 tablet daily with water.", "Dr. Sarah Jenkins", "Oct 12, 2023"],
+                ["RX-902", "P-4923", "Eleanor Pena", "Cetirizine 10mg", "1 tablet", "As needed for allergies.", "Dr. William Smith", "Apr 04, 2023"]
+            ];
+            dummyPrescriptions.forEach(rx => stmt.run(rx));
+            stmt.finalize();
+        }
+    });
+
 });
 
 module.exports = db;

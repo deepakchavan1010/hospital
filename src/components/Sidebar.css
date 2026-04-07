@@ -14,17 +14,32 @@
   align-items: center;
   gap: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-brand::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  transform: translateX(-100%);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  100% { transform: translateX(100%); }
 }
 
 .brand-logo {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 8px 16px rgba(79, 70, 229, 0.4);
 }
 
 .brand-title {
@@ -57,18 +72,21 @@
   border-radius: var(--border-radius-sm);
   font-weight: 500;
   transition: all var(--transition-fast);
+  border: 1px solid transparent;
 }
 
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.05);
   color: white;
   transform: translateX(4px);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .nav-link.active {
-  background: var(--primary-color);
+  background: linear-gradient(90deg, var(--primary-color), rgba(79, 70, 229, 0.8));
   color: white;
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  border-color: transparent;
 }
 
 .sidebar-footer {

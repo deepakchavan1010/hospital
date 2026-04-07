@@ -7,17 +7,24 @@ const Patients = () => {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
+  const [selectedPatientForMed, setSelectedPatientForMed] = useState(null);
+
   const [formData, setFormData] = useState({
     name: '', age: '', gender: 'Male', doctor: 'Dr. Sarah Jenkins', diagnosis: '', status: 'Stable'
+  });
+
+  const [medData, setMedData] = useState({
+    medicineName: '', dosage: '1 tablet', instructions: 'Take daily after food'
   });
 
   const fetchPatients = () => {
     fetch('http://localhost:5000/api/patients')
       .then(res => {
-        if(!res.ok) throw new Error('Failed to fetch patients');
+        if (!res.ok) throw new Error('Failed to fetch patients');
         return res.json();
       })
       .then(data => {
@@ -48,16 +55,48 @@ const Patients = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newPatient)
     })
-    .then(res => {
-      if(!res.ok) throw new Error("Failed to add");
-      return res.json();
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to add");
+        return res.json();
+      })
+      .then(() => {
+        setIsModalOpen(false);
+        setFormData({ name: '', age: '', gender: 'Male', doctor: 'Dr. Sarah Jenkins', diagnosis: '', status: 'Stable' });
+        fetchPatients(); // Refetch Data dynamically!
+      })
+      .catch(err => alert("Error adding patient: " + err.message));
+  };
+
+  const handleAddMedicine = (e) => {
+    e.preventDefault();
+    if (!selectedPatientForMed) return;
+
+    const newPrescription = {
+      id: `RX-${Math.floor(Math.random() * 900) + 100}`,
+      patientId: selectedPatientForMed.id,
+      patientName: selectedPatientForMed.name,
+      medicineName: medData.medicineName,
+      dosage: medData.dosage,
+      instructions: medData.instructions,
+      prescribedBy: selectedPatientForMed.doctor, // typically the current logged-in doctor, but using the assigned doctor for mockup
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+    };
+
+    fetch('http://localhost:5000/api/prescriptions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newPrescription)
     })
-    .then(() => {
-      setIsModalOpen(false);
-      setFormData({ name: '', age: '', gender: 'Male', doctor: 'Dr. Sarah Jenkins', diagnosis: '', status: 'Stable' });
-      fetchPatients(); // Refetch Data dynamically!
-    })
-    .catch(err => alert("Error adding patient: " + err.message));
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to add prescription");
+        return res.json();
+      })
+      .then(() => {
+        setIsPrescriptionModalOpen(false);
+        setMedData({ medicineName: '', dosage: '1 tablet', instructions: 'Take daily after food' });
+        alert('Prescription successfully added!');
+      })
+      .catch(err => alert("Error adding prescription: " + err.message));
   };
 
   return (
@@ -68,13 +107,13 @@ const Patients = () => {
           <p className="page-subtitle">View and manage all patient records.</p>
         </div>
         <button className="btn" onClick={() => setIsModalOpen(true)}>
-          <Plus size={20}/> Add Patient
+          <Plus size={20} /> Add Patient
         </button>
       </div>
 
       <div className="card">
         <div className="card-header">
-          <div className="header-search" style={{width: '300px'}}>
+          <div className="header-search" style={{ width: '300px' }}>
             <Search className="search-icon" size={20} />
             <input type="text" placeholder="Search by name or ID..." className="search-input" />
           </div>
@@ -82,9 +121,9 @@ const Patients = () => {
 
         <div className="table-responsive">
           {loading ? (
-             <p style={{padding: '24px', textAlign: 'center'}}>Loading patient data...</p>
+            <p style={{ padding: '24px', textAlign: 'center' }}>Loading patient data...</p>
           ) : error ? (
-             <p style={{padding: '24px', textAlign: 'center', color: 'red'}}>{error}. Ensure backend is running.</p>
+            <p style={{ padding: '24px', textAlign: 'center', color: 'red' }}>{error}. Ensure backend is running.</p>
           ) : (
             <table className="data-table">
               <thead>
@@ -106,7 +145,19 @@ const Patients = () => {
                     <td>{p.doctor}</td>
                     <td>{p.lastVisit}</td>
                     <td>
-                      <button className="btn-secondary" style={{padding: '6px 12px', fontSize: '0.8rem'}}>View</button>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem' }}>View</button>
+                        <button
+                          className="btn"
+                          style={{ padding: '6px 12px', fontSize: '0.8rem', background: 'var(--success)' }}
+                          onClick={() => {
+                            setSelectedPatientForMed(p);
+                            setIsPrescriptionModalOpen(true);
+                          }}
+                        >
+                          Prescribe
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -118,30 +169,30 @@ const Patients = () => {
 
       {/* Reusable Modal specifically triggering AddPatient Logic */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Register New Patient">
-        <form onSubmit={handleAddPatient} style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-          <div style={{display: 'flex', gap: '16px'}}>
-            <div style={{flex: 1}}>
-              <label style={{fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display:'block'}}>Full Name</label>
-              <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required style={{width: '100%'}} />
+        <form onSubmit={handleAddPatient} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display: 'block' }}>Full Name</label>
+              <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required style={{ width: '100%' }} />
             </div>
-            <div style={{flex: 0.5}}>
-              <label style={{fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display:'block'}}>Age</label>
-              <input type="number" value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} required style={{width: '100%'}} />
+            <div style={{ flex: 0.5 }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display: 'block' }}>Age</label>
+              <input type="number" value={formData.age} onChange={e => setFormData({ ...formData, age: e.target.value })} required style={{ width: '100%' }} />
             </div>
           </div>
-          
-          <div style={{display: 'flex', gap: '16px'}}>
-            <div style={{flex: 1}}>
-              <label style={{fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display:'block'}}>Gender</label>
-              <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} style={{width: '100%'}}>
+
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display: 'block' }}>Gender</label>
+              <select value={formData.gender} onChange={e => setFormData({ ...formData, gender: e.target.value })} style={{ width: '100%' }}>
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
               </select>
             </div>
-            <div style={{flex: 1}}>
-              <label style={{fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display:'block'}}>Doctor Assigned</label>
-              <select value={formData.doctor} onChange={e => setFormData({...formData, doctor: e.target.value})} style={{width: '100%'}}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display: 'block' }}>Doctor Assigned</label>
+              <select value={formData.doctor} onChange={e => setFormData({ ...formData, doctor: e.target.value })} style={{ width: '100%' }}>
                 <option>Dr. Sarah Jenkins</option>
                 <option>Dr. William Smith</option>
                 <option>Dr. Emily Chen</option>
@@ -150,11 +201,35 @@ const Patients = () => {
           </div>
 
           <div>
-             <label style={{fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display:'block'}}>Diagnosis Reason</label>
-             <input type="text" value={formData.diagnosis} onChange={e => setFormData({...formData, diagnosis: e.target.value})} required style={{width: '100%'}} />
+            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display: 'block' }}>Diagnosis Reason</label>
+            <input type="text" value={formData.diagnosis} onChange={e => setFormData({ ...formData, diagnosis: e.target.value })} required style={{ width: '100%' }} />
           </div>
 
-          <button type="submit" className="btn" style={{marginTop: '16px'}}>Save Patient Record</button>
+          <button type="submit" className="btn" style={{ marginTop: '16px' }}>Save Patient Record</button>
+        </form>
+      </Modal>
+
+      {/* Prescription Modal */}
+      <Modal isOpen={isPrescriptionModalOpen} onClose={() => setIsPrescriptionModalOpen(false)} title={`Prescribe Medicine for ${selectedPatientForMed?.name}`}>
+        <form onSubmit={handleAddMedicine} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display: 'block' }}>Medicine Name</label>
+            <input type="text" value={medData.medicineName} onChange={e => setMedData({ ...medData, medicineName: e.target.value })} required style={{ width: '100%' }} placeholder="e.g. Lisinopril 10mg" />
+          </div>
+
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display: 'block' }}>Dosage</label>
+              <input type="text" value={medData.dosage} onChange={e => setMedData({ ...medData, dosage: e.target.value })} required style={{ width: '100%' }} placeholder="e.g. 1 tablet" />
+            </div>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px', display: 'block' }}>Usage Instructions</label>
+            <input type="text" value={medData.instructions} onChange={e => setMedData({ ...medData, instructions: e.target.value })} required style={{ width: '100%' }} placeholder="e.g. Take daily after food" />
+          </div>
+
+          <button type="submit" className="btn" style={{ marginTop: '16px', background: 'var(--success)' }}>Add Prescription to Record</button>
         </form>
       </Modal>
     </div>

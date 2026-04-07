@@ -52,7 +52,7 @@ const Dashboard = () => {
           <h1 className="page-title">Dashboard Overview</h1>
           <p className="page-subtitle">Welcome back! Here is your hospital summary today.</p>
         </div>
-        <button className="btn">Generate Report</button>
+        <button className="btn" onClick={() => window.print()}>Generate Report</button>
       </div>
 
       <div className="stats-grid">

@@ -1,4 +1,5 @@
-import { Calendar as CalendarIcon, Clock, LogIn } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, LogIn, Activity, Brain, Baby, Bone } from 'lucide-react';
+import './PatientAppointments.css';
 import Modal from '../../components/Modal';
 import { useState, useEffect } from 'react';
 
@@ -6,7 +7,15 @@ const PatientAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedSpec, setSelectedSpec] = useState(null);
   
+  const specializations = [
+    { id: 'cardiologist', name: 'Cardiologist', icon: <Activity size={24} /> },
+    { id: 'neurologist', name: 'Neurologist', icon: <Brain size={24} /> },
+    { id: 'pediatrician', name: 'Pediatrician', icon: <Baby size={24} /> },
+    { id: 'orthopedic', name: 'Orthopedic', icon: <Bone size={24} /> },
+  ];
+
   const fetchAppointments = () => {
     fetch('http://localhost:5000/api/appointments')
       .then(res => res.json())
@@ -29,7 +38,7 @@ const PatientAppointments = () => {
           <h1 className="page-title">My Appointments</h1>
           <p className="page-subtitle">Schedule or review your hospital visits.</p>
         </div>
-        <button className="btn" style={{ background: '#05cd99' }} onClick={() => setIsModalOpen(true)}>
+        <button className="btn btn-emerald" onClick={() => setIsModalOpen(true)}>
            Request New Appointment
         </button>
       </div>
@@ -61,18 +70,35 @@ const PatientAppointments = () => {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Select Specialization">
-         <div style={{ textAlign: 'center', padding: '20px 0' }}>
-            <p style={{ marginBottom: '24px', color: 'var(--text-muted)' }}>Choose what kind of doctor you need to see.</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
-               <button className="btn-secondary">Cardiologist</button>
-               <button className="btn-secondary">Neurologist</button>
-               <button className="btn-secondary">Pediatrician</button>
-               <button className="btn-secondary">Orthopedic</button>
+         <div className="specialization-modal-content">
+            <p className="modal-description">Choose the medical specialist you need to consult with.</p>
+            
+            <div className="specialization-grid">
+               {specializations.map((spec) => (
+                 <button 
+                   key={spec.id}
+                   className={`spec-card ${selectedSpec === spec.id ? 'active' : ''}`}
+                   onClick={() => setSelectedSpec(spec.id)}
+                 >
+                   <div className="spec-icon-wrapper">
+                     {spec.icon}
+                   </div>
+                   <span className="spec-name">{spec.name}</span>
+                 </button>
+               ))}
             </div>
-            <button className="btn" style={{ marginTop: '32px', width: '100%', background: '#05cd99' }} onClick={() => {
-                setIsModalOpen(false);
-                alert("Redirecting to Doctor Availability Calendar...");
-            }}>Find Availability</button>
+            
+            <button 
+              className="btn btn-emerald" 
+              style={{ marginTop: '32px', width: '100%', padding: '16px', fontSize: '1.05rem' }} 
+              disabled={!selectedSpec}
+              onClick={() => {
+                  setIsModalOpen(false);
+                  alert(`Redirecting to Doctor Availability Calendar for ${specializations.find(s=>s.id===selectedSpec)?.name}...`);
+              }}
+            >
+              Continue to Availability
+            </button>
          </div>
       </Modal>
     </div>

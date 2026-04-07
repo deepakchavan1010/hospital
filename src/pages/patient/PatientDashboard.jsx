@@ -1,6 +1,27 @@
 import { Heart, Activity, FileText } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const PatientDashboard = () => {
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [medLoading, setMedLoading] = useState(true);
+
+  // In a real app we'd get the patient name from auth. Defaulting to our dummy patient "Eleanor Pena" or similar
+  const activePatientName = "Eleanor Pena"; 
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/prescriptions?patient=${activePatientName}`)
+      .then(res => res.json())
+      .then(data => {
+        // Fallback to empty array if error or undefined
+        setPrescriptions(Array.isArray(data) ? data : []);
+        setMedLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setMedLoading(false);
+      });
+  }, [activePatientName]);
+
   return (
     <div className="animate-fade-in dashboard">
       <div className="dashboard-header">
@@ -46,16 +67,21 @@ const PatientDashboard = () => {
                 <FileText color="var(--secondary-color)" /> <h3 style={{fontSize: '1.1rem'}}>Prescriptions & Meds</h3>
              </div>
            </div>
-           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-             <li style={{ borderBottom: '1px solid #edf2f7', paddingBottom: '12px' }}>
-                <strong>Lisinopril 10mg</strong>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Take 1 tablet daily with water.</p>
-             </li>
-             <li>
-                <strong>Cetirizine 10mg</strong>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>As needed for allergies.</p>
-             </li>
-           </ul>
+           {medLoading ? (
+             <p style={{ color: 'var(--text-muted)' }}>Loading records...</p>
+           ) : prescriptions.length === 0 ? (
+             <p style={{ color: 'var(--text-muted)' }}>No current prescriptions found.</p>
+           ) : (
+             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+               {prescriptions.map((rx, idx) => (
+                 <li key={idx} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', paddingBottom: '12px' }}>
+                    <strong>{rx.medicineName} ({rx.dosage})</strong>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>{rx.instructions}</p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--primary-color)', marginTop: '4px' }}>Prescribed by {rx.prescribedBy} on {rx.date}</p>
+                 </li>
+               ))}
+             </ul>
+           )}
         </div>
       </div>
     </div>

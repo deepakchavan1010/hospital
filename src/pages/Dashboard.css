@@ -11,14 +11,20 @@
 }
 
 .page-title {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--text-main), var(--primary-color));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-bottom: 8px;
 }
 
 .page-subtitle {
   color: var(--text-muted);
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 400;
 }
 
 .stats-grid {
@@ -61,16 +67,17 @@
 }
 
 .stat-value {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: var(--text-main);
+  letter-spacing: -0.5px;
 }
 
 .stat-trend {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
 }
 
 .stat-trend.positive {
@@ -93,11 +100,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+}
+
+.card-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
 }
 
 .table-responsive {
   overflow-x: auto;
+  border-radius: var(--border-radius-sm);
 }
 
 .data-table {
@@ -134,10 +148,12 @@
 }
 
 .status-badge {
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
+  display: inline-block;
+  backdrop-filter: blur(4px);
 }
 
 .status-badge.stable {
@@ -166,16 +182,18 @@
   display: flex;
   gap: 16px;
   padding: 16px;
-  background: #f8fafc;
+  background: var(--glass-bg);
+  border: 1px solid rgba(0,0,0,0.05);
   border-radius: var(--border-radius-sm);
   border-left: 4px solid var(--primary-color);
   transition: all var(--transition-fast);
 }
 
 .appointment-item:hover {
-  transform: translateX(4px);
+  transform: translateX(6px);
   background: white;
   box-shadow: var(--shadow-sm);
+  border-color: rgba(0,0,0,0.1);
 }
 
 .appt-time {
